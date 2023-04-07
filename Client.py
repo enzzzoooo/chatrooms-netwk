@@ -26,13 +26,13 @@ localPort = int(sys.argv[2])
     # create help commands and descriptions
     # clear help commands once user has input a message/prompt
 
-serverIP = "127.0.0.1"
+clientIP = "127.0.0.1"
+
+clientPort = random.randint(8000, 10000)
 
 bufferSize = 1024
 
-client_socket.bind((serverIP, random.randint(8000, 10000)))
-
-
+client_socket.bind((clientIP, clientPort))
 
 print("\nWelcome to chatroom of make benefit glorious nation of Kazakhstan!\n")
 print("----- USER COMMANDS -----")
