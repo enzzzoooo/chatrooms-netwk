@@ -34,8 +34,8 @@ client_socket.bind((serverIP, random.randint(8000, 10000)))
 
 
 
-print("Welcome to chatroom of make benefit glorious nation of Kazakhstan!")
-print("\n---USER COMMANDS---")
+print("\nWelcome to chatroom of make benefit glorious nation of Kazakhstan!\n")
+print("----- USER COMMANDS -----")
 print("\nJOIN CHATROOM: /join <server_ip_add> <port>")
 print("LEAVE CHATROOM: /leave")
 print("REGISTER HANDLE: /register <handle>")
@@ -50,6 +50,9 @@ def receive():
         except:
             pass
 
+
+receive_thread = threading.Thread(target=receive)
+receive_thread.start()
 
 user_registered = False
 user_joined = False
