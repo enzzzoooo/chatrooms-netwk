@@ -56,20 +56,19 @@ def broadcast():
             if address not in client_list:
                 client_list.append(address)
 
-            if message.decode().startswith("/all") or message.decode().startswith("HANDLE:"):
-                # sent_message = message.decode().split().index(1)
-                # sent_message = "/all hello bozos" => "hello bozos"
-                sent_message = message.decode()[message.decode().index("/") + 4:]
-                for client in client_list:
-                    try:
-                        if message.decode().startswith("HANDLE:"):
-                            name = message.decode()[message.decode().index(":") + 1:]
-                            server_socket.sendto(f"Welcome {name}!".encode(), client)
-                        else:
-                            server_socket.sendto(sent_message, client)
-                    except:
-                        client_list.remove(client)
-            elif message.decode().startswith("/msg"):
+            for client in client_list:
+                try:
+                    if message.decode().startswith("HANDLE:"):
+                        name = message.decode()[message.decode().index(":") + 1:]
+                        if client != address:
+                            server_socket.sendto(f"{name} has joined the chatroom.".encode(), client)
+                    elif message.decode().startswith("/all"):
+                        # sent_message = re.sub('[/all]', "", message.decode())
+                        server_socket.sendto(message, client)
+                except:
+                    client_list.remove(client)
+
+            if message.decode().startswith("/msg"):
                 sent_message = message.decode().split()[2:]
                 destination_address = message.decode().split().index(1)
                 if destination_address in client_list:

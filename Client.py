@@ -76,6 +76,7 @@ while True:
         client_socket.sendto(f"Port #{serverPort} has connected to the chatroom!".encode(), (serverIP, serverPort))
         user_joined = True
     elif(user_input.startswith("/register")):
+
         name = user_input.split()[1]
         client_socket.sendto(f"HANDLE:{name}".encode(), (serverIP, serverPort))
         user_registered = True
