@@ -1,11 +1,11 @@
+import queue
 import socket
 import select
 import sys
 import time
+import threading
 
-from _thread import *
-
-print("hello")
+print("hello ")
 
 server_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 
@@ -22,34 +22,48 @@ localPort = int(sys.argv[2])
 
 """
 
-localIP     = "127.0.0.1"
+localIP = "127.0.0.1"
 
-localPort   = 8888
+localPort = 9005
 
-bufferSize  = 2048
+bufferSize = 1024
 
-server_socket.bind((localIP,localPort))
+server_socket.bind((localIP, localPort))
 
 client_list = []
+message_queue = queue.Queue()
+
+# receive messages
+def receive():
+    while True:
+        try:
+            message, client_address_source = server_socket.recvfrom(bufferSize)
+            print(client_address_source, "says: ", message.decode())
+            message_queue.put((message, client_address_source))
+        except:
+            pass
 
 
 # functions
-def broadcast(message, sender_socket):
-    for client_socket in client_list:
-        if client_socket != sender_socket:
-            server_socket.sendto(message.encode(), client_address)
+def broadcast():
+    while True:
+        while not message_queue.empty():
+            message, address = message_queue.get()
+            print(message.decode)
+            if address not in client_list:
+                    client_list.append(address)
+            for client in client_list:
+                try:
+                    if message.decode().startswith("SIGNUP_TAG:"):
+                        name = message.decode()[message.decode().index(":")+1:]
+                        server_socket.sendto(f"{name} has joined the chatroom!".encode(), client)
+                    else:
+                        server_socket.sendto(message, client)
+                except:
+                    client_list.remove(client)
 
-def client_thread(client_socket, client_address):
-    broadcast("[" + time.ctime(time.time()) + "  " + client_address[0] +  "] : " + message.decode(), client_address)
+receive_thread = threading.Thread(target=receive)
+broadcast_thread = threading.Thread(target=broadcast)
 
-
-
-while(True):
-    message, client_address = server_socket.recvfrom(bufferSize)
-
-    if client_address not in client_list:
-        client_list.append(client_address)
-
-    print (client_address[0] + " connected")
-
-    start_new_thread(client_thread,(message, client_address))
+receive_thread.start()
+broadcast_thread.start()

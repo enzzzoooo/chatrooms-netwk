@@ -1,6 +1,8 @@
 import socket
 import select
 import sys
+import threading
+import random
 
 client_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 
@@ -17,28 +19,41 @@ localPort = int(sys.argv[2])
 
 """
 
-localIP     = "127.0.0.1"
+# codeblock here for help commands
+def helpcommands():
+    print("Welcome to chatroom of make benefit glorious nation of Kazakhstan!")
 
-localPort   = 8888
+localIP = "127.0.0.1"
 
-bufferSize  = 2048
+bufferSize = 1024
 
-client_socket.connect(localIP,localPort)
+client_socket.bind((localIP, random.randint(8000, 10000)))
+
+name = input("Nickname: ")
+
+# put here codeblocks for join
+def receive():
+    while True:
+        try:
+            message, address = client_socket.recvfrom(1024)
+            print(message.decode())
+        except:
+            pass
+
+
+receive_thread = threading.Thread(target=receive)
+receive_thread.start()
+# fix register so that we comply with specs
+client_socket.sendto(f"SIGNUP_TAG:{name}".encode(), ("localhost", 9005))
 
 while True:
-    sockets = [sys.stdin, client_socket]
+    sent_message = input("")
+    # create mod code so that user can leave
+    if sent_message == "/leave":
+        exit()
+    else:
+        client_socket.sendto(f"{name}: {sent_message}".encode(), ("localhost", 9005))
 
-    select.select()
-    read_sockets, write_socket, error_socket = select.select(sockets,[],[])
- 
-    for socks in read_sockets:
-        if socks == client_socket:
-            message = socks.recvfrom(2048)
-            print (message)
-        else:
-            message = sys.stdin.readline()
-            client_socket.send(message)
-            sys.stdout.write("<You>")
-            sys.stdout.write(message)
-            sys.stdout.flush()
-client_socket.close()
+# create mod code so that user can leave
+vclient_socket.close()
+
