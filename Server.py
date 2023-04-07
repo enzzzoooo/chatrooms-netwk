@@ -24,7 +24,7 @@ localPort = int(sys.argv[2])
 
 localIP = "127.0.0.1"
 
-localPort = 9006
+localPort = 9009
 
 bufferSize = 1024
 
@@ -32,6 +32,7 @@ server_socket.bind((localIP, localPort))
 
 client_list = []
 message_queue = queue.Queue()
+
 
 # receive messages
 def receive():
@@ -50,17 +51,31 @@ def broadcast():
         while not message_queue.empty():
             message, address = message_queue.get()
             print(message.decode)
+
             if address not in client_list:
-                    client_list.append(address)
-            for client in client_list:
-                try:
-                    if message.decode().startswith("SIGNUP_TAG:"):
-                        name = message.decode()[message.decode().index(":")+1:]
-                        server_socket.sendto(f"{name} has joined the chatroom!".encode(), client)
-                    else:
-                        server_socket.sendto(message, client)
-                except:
-                    client_list.remove(client)
+                client_list.append(address)
+
+            if message.decode().startswith("/all") or message.decode().startswith("HANDLE:"):
+                # sent_message = message.decode().split().index(1)
+                # sent_message = "/all hello bozos" => "hello bozos"
+                sent_message = message.decode()[message.decode().index("/") + 4:]
+                for client in client_list:
+                    try:
+                        if message.decode().startswith("HANDLE:"):
+                            name = message.decode()[message.decode().index(":") + 1:]
+                            server_socket.sendto(f"Welcome {name}!".encode(), client)
+                        else:
+                            server_socket.sendto(sent_message, client)
+                    except:
+                        client_list.remove(client)
+            elif message.decode().startswith("/msg"):
+                sent_message = message.decode().split()[2:]
+                destination_address = message.decode().split().index(1)
+                if destination_address in client_list:
+                    server_socket.sendto(sent_message, destination_address)
+
+            # error msg
+
 
 receive_thread = threading.Thread(target=receive)
 broadcast_thread = threading.Thread(target=broadcast)
