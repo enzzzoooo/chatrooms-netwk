@@ -24,7 +24,7 @@ localPort = int(sys.argv[2])
 
 localIP = "127.0.0.1"
 
-localPort = 9005
+localPort = 9006
 
 bufferSize = 1024
 
