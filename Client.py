@@ -34,7 +34,7 @@ bufferSize = 1024
 
 client_socket.bind((clientIP, clientPort))
 
-print("\nWelcome to chatroom of make benefit glorious nation of Kazakhstan!\n")
+print("\nWelcome to chatroom of glorious nation of Kazakhstan!\n")
 print("----- USER COMMANDS -----")
 print("\nJOIN CHATROOM: /join <server_ip_add> <port>")
 print("LEAVE CHATROOM: /leave")
@@ -61,8 +61,8 @@ user_input = input("\nEnter text here: ")
 
 while True:
     if(user_input == "/leave" and user_registered == True and user_joined == True):
-        print("Connection closed. Thank you!")
-        client_socket.sendto(f"{name} has left the chatroom.".encode(), (serverIP, serverPort))
+        print("\nConnection closed. Thank you!")
+        client_socket.sendto(f"\n{name} has left the chatroom.".encode(), (serverIP, serverPort))
         serverIP, serverPort = 0
         break
     elif (user_input.startswith("/join")):
@@ -71,15 +71,15 @@ while True:
         serverIP = client_details[1]
         serverPort = int(client_details[2])
         bufferSize = 1024
-        print("Connection to the Message Board Server is successful!")
-        client_socket.sendto(f"Port #{serverPort} has connected to the chatroom!".encode(), (serverIP, serverPort))
+        print("\nConnection to the Message Board Server is successful!")
+        client_socket.sendto(f"\nPort #{clientPort} has connected to the chatroom!".encode(), (serverIP, serverPort))
         user_joined = True
     elif(user_input.startswith("/register")):
 
         name = user_input.split()[1]
         client_socket.sendto(f"HANDLE:{name}".encode(), (serverIP, serverPort))
         user_registered = True
-        print(f"Welcome {name}!")
+
     elif(user_input.startswith("/msg") or user_input.startswith("/all") and user_registered == True):
         client_socket.sendto(f"\n{user_input} {clientPort}".encode(),(serverIP, serverPort))
         #client_socket.sendto(f"{name}: {sent_message}".encode(), (serverIP, serverPort))
@@ -91,7 +91,9 @@ while True:
         print("BROADCAST MESSAGE TO ALL: /all <message>")
         print("SEND DIRECT MESSAGE TO SINGLE HANDLE: /msg <handle> <message>\n\n")
     else:
-        print("Command not found. Use /? for the command list.")
+        print("\nCommand not found. Use /? for the command list.")
+
+    user_input = input("\nEnter text here: ")
 
     sleep(0.75)
 
