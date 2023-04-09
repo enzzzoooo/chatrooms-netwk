@@ -31,7 +31,8 @@ bufferSize = 1024
 
 server_socket.bind((localIP, localPort))
 
-client_list = []
+client_list = [] # address and name
+client_list_address = [] # address
 message_queue = queue.Queue()
 
 
@@ -43,7 +44,7 @@ def receive():
             print(client_address_source, "says: ", message.decode())
             message_queue.put((message, client_address_source))
         except:
-            pass
+            print("you done fucked up")
 
 
 # functions
@@ -53,32 +54,89 @@ def broadcast():
             message, address = message_queue.get()
             print(message.decode)
 
-            if address not in client_list:
-                client_list.append(address)
+            # register condition such that if register
 
-            for client in client_list:
-                try:
-                    if message.decode().startswith("HANDLE:"):
-                        name = message.decode()[message.decode().index(":") + 1:]
-                        if client != address:
-                            server_socket.sendto(f"{name} has joined the chatroom.".encode(), client)
-                    elif message.decode().startswith("/all"):
+            if message.decode().startswith("/join"):
+                pass
+
+            if message.decode().startswith("HANDLE:"):
+                name = message.decode()[message.decode().index(":") + 1:]
+                if name not in client_list:
+                    client_list.extend([address, name])
+                    client_list_address.append(address)
+
+                    for client in client_list_address:
+                        server_socket.sendto(f"\n{name} has joined the chatroom.".encode(), client)
+
+                    server_socket.sendto(f"\nWelcome {name}!".encode(), address)
+                else:
+                    server_socket.sendto(f"\nError: Registration failed. Handle or alias already exists.".encode(), address)
+
+
+            if address in client_list:
+                if message.decode().startswith("/all"):
+                    if len(message.decode()) >= 2:
                         # sent_message = re.sub('[/all]', "", message.decode())
-                        server_socket.sendto(message, client)
+                        for client in client_list:
+                            server_socket.sendto((message, client[0]))
+                    else:
+                        server_socket.sendto(f"\nError: Command parameters do not match or is not allowed.".encode(), address)
+
+                if message.decode().startswith("/msg"):
+                    if len(message.decode()) == 3:
+
+                        sent_message = message.decode().split()[2::]
+                        destination_address = message.decode().split()[1]
+
+                        if destination_address in client_list:
+                            server_socket.sendto(sent_message, destination_address)
+                        else:
+                            server_socket.sendto(f"\nError: Handle or alias not found.".encode(), address)
+                    else:
+                        server_socket.sendto(f"\nError: Command parameters do not match or is not allowed.".encode(), address)
+
+
+
+
+
+
+
+
+            """
+
+            for client in client_list_address:
+                if message.decode().startswith("HANDLE:"):
+                    # if client != address:
+                    server_socket.sendto(f"{name} has joined the chatroom.".encode(), client)
+
+                try:
+                    if message.decode().startswith("/all"):
+                        if len(message.decode()) == 2:
+                            # sent_message = re.sub('[/all]', "", message.decode())
+                            for client in client_list:
+                                server_socket.sendto(message, client)
+                        else:
+                            server_socket.sendto(f"Error: Command parameters do not match or is not allowed.".encode(),
+                                                 client)
+
+                    if message.decode().startswith("/msg"):
+                        if len(message.decode()) == 3:
+                            sent_message = message.decode().split()[2:]
+                            destination_address = message.decode().split().index(1)
+                            if destination_address in client_list:
+                                server_socket.sendto(sent_message, destination_address)
+                        else:
+                            server_socket.sendto(f"Error: Command parameters do not match or is not allowed.".encode(),
+                                                 client)
                 except:
-                    client_list.remove(client)
+                    print("you done fucked up")
+                    server_socket.sendto(f"Error: Command not found.".encode(), client)
 
-            if message.decode().startswith("/msg"):
-                sent_message = message.decode().split()[2:]
-                destination_address = message.decode().split().index(1)
-                if destination_address in client_list:
-                    server_socket.sendto(sent_message, destination_address)
-
-            # error msg
-
+            """
 
 receive_thread = threading.Thread(target=receive)
 broadcast_thread = threading.Thread(target=broadcast)
 
 receive_thread.start()
 broadcast_thread.start()
+

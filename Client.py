@@ -57,10 +57,9 @@ receive_thread.start()
 user_registered = False
 user_joined = False
 
-
+user_input = input("\nEnter text here: ")
 
 while True:
-    user_input = input("\nEnter text here: ")
     if(user_input == "/leave" and user_registered == True and user_joined == True):
         print("Connection closed. Thank you!")
         client_socket.sendto(f"{name} has left the chatroom.".encode(), (serverIP, serverPort))
@@ -82,7 +81,7 @@ while True:
         user_registered = True
         print(f"Welcome {name}!")
     elif(user_input.startswith("/msg") or user_input.startswith("/all") and user_registered == True):
-        client_socket.sendto(f"{user_input}".encode(),(serverIP, serverPort))
+        client_socket.sendto(f"\n{user_input} {clientPort}".encode(),(serverIP, serverPort))
         #client_socket.sendto(f"{name}: {sent_message}".encode(), (serverIP, serverPort))
     elif(user_input.startswith("/?")):
         print("----- USER COMMANDS -----")
@@ -94,7 +93,7 @@ while True:
     else:
         print("Command not found. Use /? for the command list.")
 
-    sleep(0.25)
+    sleep(0.75)
 
 
 
