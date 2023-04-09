@@ -65,6 +65,9 @@ while True:
         print("\nConnection closed. Thank you!")
         client_socket.sendto(f"\n{name} has left the chatroom.".encode(), (serverIP, serverPort))
         serverIP, serverPort = 0
+        user_registered = False
+        user_joined = False
+        client_socket.close()
         break
     elif(user_input == "/leave" and user_registered == False):
         print("\n: Disconnection failed. Please connect to the server first.")
@@ -89,7 +92,8 @@ while True:
         name = user_input.split()[1]
         client_socket.sendto(f"HANDLE:{name}".encode(), (serverIP, serverPort))
         user_registered = True
-
+    elif (user_input.startswith("/register") and user_joined == False):
+        print("Error: Failed to register handle. Please connect to the server first.")
     elif(user_input.startswith("/msg") or user_input.startswith("/all") and user_registered == True):
         client_socket.sendto(f"{user_input}".encode(),(serverIP, serverPort))
     elif(user_input.startswith("/?")):
@@ -100,7 +104,7 @@ while True:
         print("BROADCAST MESSAGE TO ALL: /all <message>")
         print("SEND DIRECT MESSAGE TO SINGLE HANDLE: /msg <handle> <message>\n\n")
     else:
-        print("\nCommand not found. Use /? for the command list.")
+        print("\nCommand not found.")
 
     sleep(0.75)
 

@@ -10,19 +10,6 @@ print("hello ")
 
 server_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 
-"""
-code to take localIP and port from args instead of declaring them:
-
-
-if len(sys.argv) != 3:
-    print("Correct usage: script, IP address, port number")
-
-localIP = str(sys.argv[1])
-
-localPort = int(sys.argv[2])
-
-"""
-
 localIP = "127.0.0.1"
 
 localPort = 12345
@@ -98,7 +85,8 @@ def broadcast():
                             server_socket.sendto(f"\nError: Handle or alias not found.".encode(), address)
                     else:
                         server_socket.sendto(f"\nError: Command parameters do not match or is not allowed.".encode(), address)
-
+                else:
+                    server_socket.sendto(f"\nError: Command not found.".encode(), address)
 
 
 
