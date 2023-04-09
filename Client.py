@@ -61,34 +61,38 @@ user_joined = False
 while True:
     user_input = input()
 
-    if(user_input == "/leave" and user_registered == True and user_joined == True):
+    if (user_input == "/leave" and user_joined == False):
+        print("\n: Disconnection failed. Please connect to the server first.")
+    elif(user_input == "/leave" and user_registered == True or user_joined == True):
         print("\nConnection closed. Thank you!")
-        client_socket.sendto(f"\n{name} has left the chatroom.".encode(), (serverIP, serverPort))
-        serverIP, serverPort = 0
+        if(user_registered == True):
+            client_socket.sendto(f"\n{name} has left the chatroom.".encode(), (serverIP, serverPort))
+
+        serverIP = 0
+        serverPort = 0
         user_registered = False
         user_joined = False
         client_socket.close()
         break
-    elif(user_input == "/leave" and user_registered == False):
-        print("\n: Disconnection failed. Please connect to the server first.")
-    elif (user_input.startswith("/join" and user_joined == False)):
+
+    elif (user_input.startswith("/join") and user_joined == False):
         # get local ip and port by doing a substring of the join command
 
         client_details = user_input.split()
         serverIP = client_details[1]
-        serverPort = int(client_details[2])
+        serverPort = client_details[2]
 
-        if serverIP != "127.0.0.1" and serverPort != 12345 and len(client_details) != 3:
+        if serverIP != "127.0.0.1" or serverPort != "12345" or len(client_details) != 3:
             print("Error: Connection to the Message Board Server has failed! Please check IP Address and Port Number.")
         else:
             client_socket.bind((clientIP, clientPort))
             bufferSize = 1024
             print("\nConnection to the Message Board Server is successful!")
-            client_socket.sendto(f"Port #{clientPort} has connected to the chatroom!".encode(), (serverIP, serverPort))
+            client_socket.sendto(f"Port #{clientPort} has connected to the chatroom!".encode(), (serverIP, int(serverPort)))
             user_joined = True
-    elif (user_input.startswith("/join" and user_joined == True)):
+    elif (user_input.startswith("/join") and user_joined == True):
         print("Error: Failed to connect to Message Board Server. You are already connected.")
-    elif(user_input.startswith("/register") and user_joined == True):
+    elif user_input.startswith("/register") and user_joined == True:
         name = user_input.split()[1]
         client_socket.sendto(f"HANDLE:{name}".encode(), (serverIP, serverPort))
         user_registered = True
