@@ -32,7 +32,7 @@ clientPort = random.randint(8000, 10000)
 
 bufferSize = 1024
 
-client_socket.bind((clientIP, clientPort))
+
 
 print("\nWelcome to chatroom of glorious nation of Kazakhstan!\n")
 print("----- USER COMMANDS -----")
@@ -57,32 +57,41 @@ receive_thread.start()
 user_registered = False
 user_joined = False
 
-user_input = input("\nEnter text here: ")
 
 while True:
+    user_input = input()
+
     if(user_input == "/leave" and user_registered == True and user_joined == True):
         print("\nConnection closed. Thank you!")
         client_socket.sendto(f"\n{name} has left the chatroom.".encode(), (serverIP, serverPort))
         serverIP, serverPort = 0
         break
-    elif (user_input.startswith("/join")):
-    # get local ip and port by doing a substring of the join command
+    elif(user_input == "/leave" and user_registered == False):
+        print("\n: Disconnection failed. Please connect to the server first.")
+    elif (user_input.startswith("/join" and user_joined == False)):
+        # get local ip and port by doing a substring of the join command
+
         client_details = user_input.split()
         serverIP = client_details[1]
         serverPort = int(client_details[2])
-        bufferSize = 1024
-        print("\nConnection to the Message Board Server is successful!")
-        client_socket.sendto(f"\nPort #{clientPort} has connected to the chatroom!".encode(), (serverIP, serverPort))
-        user_joined = True
-    elif(user_input.startswith("/register")):
 
+        if serverIP != "127.0.0.1" and serverPort != 12345 and len(client_details) != 3:
+            print("Error: Connection to the Message Board Server has failed! Please check IP Address and Port Number.")
+        else:
+            client_socket.bind((clientIP, clientPort))
+            bufferSize = 1024
+            print("\nConnection to the Message Board Server is successful!")
+            client_socket.sendto(f"Port #{clientPort} has connected to the chatroom!".encode(), (serverIP, serverPort))
+            user_joined = True
+    elif (user_input.startswith("/join" and user_joined == True)):
+        print("Error: Failed to connect to Message Board Server. You are already connected.")
+    elif(user_input.startswith("/register") and user_joined == True):
         name = user_input.split()[1]
         client_socket.sendto(f"HANDLE:{name}".encode(), (serverIP, serverPort))
         user_registered = True
 
     elif(user_input.startswith("/msg") or user_input.startswith("/all") and user_registered == True):
-        client_socket.sendto(f"\n{user_input} {clientPort}".encode(),(serverIP, serverPort))
-        #client_socket.sendto(f"{name}: {sent_message}".encode(), (serverIP, serverPort))
+        client_socket.sendto(f"{user_input}".encode(),(serverIP, serverPort))
     elif(user_input.startswith("/?")):
         print("----- USER COMMANDS -----")
         print("\nJOIN CHATROOM: /join <server_ip_add> <port>")
@@ -93,9 +102,11 @@ while True:
     else:
         print("\nCommand not found. Use /? for the command list.")
 
-    user_input = input("\nEnter text here: ")
-
     sleep(0.75)
+
+
+
+
 
 
 

@@ -25,7 +25,7 @@ localPort = int(sys.argv[2])
 
 localIP = "127.0.0.1"
 
-localPort = 9009
+localPort = 12345
 
 bufferSize = 1024
 
@@ -72,24 +72,28 @@ def broadcast():
                 else:
                     server_socket.sendto(f"\nError: Registration failed. Handle or alias already exists.".encode(), address)
 
-
             if address in client_list:
                 if message.decode().startswith("/all"):
                     if len(message.decode()) >= 2:
                         # sent_message = re.sub('[/all]', "", message.decode())
-                        for client in client_list:
-                            server_socket.sendto((message, client[0]))
+                        for client in client_list_address:
+                            server_socket.sendto(message, client)
                     else:
                         server_socket.sendto(f"\nError: Command parameters do not match or is not allowed.".encode(), address)
 
                 if message.decode().startswith("/msg"):
-                    if len(message.decode()) == 3:
+                    if len(message.decode()) >= 3:
 
-                        sent_message = message.decode().split()[2::]
-                        destination_address = message.decode().split()[1]
+                        name = message.decode().split()[1]
+                        sent_message = message.decode().split()[2:]
+                        private_message = ""
 
-                        if destination_address in client_list:
-                            server_socket.sendto(sent_message, destination_address)
+                        for word in sent_message:
+                            private_message += word + " "
+
+                        if name in client_list:
+                            destination_address = client_list[client_list.index(name)-1]
+                            server_socket.sendto(f"{name}: {private_message}".encode(), destination_address)
                         else:
                             server_socket.sendto(f"\nError: Handle or alias not found.".encode(), address)
                     else:
