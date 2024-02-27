@@ -11,3 +11,5 @@ Contribution:
 |----------------------------|--------------|
 | Ambrosio, Lorenzo Aivin F. | Client.py    |
 | Villamiel, Denis Leeroi J. | Server.py    |
+
+NOTE: Due to technical issues, during the creation of this project, all code pushed to this repository was done by only one developer (Ambrosio). The other developer (Villamiel) contributed to the project by making local changes on Ambrosio's machine.
