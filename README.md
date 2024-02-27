@@ -6,4 +6,8 @@ Messaging can be done through:
 - Multicast: 1-to-many
 - Broadcast: 1-to-all
 
-
+Contribution:
+| Name of developer          | Contribution |
+|----------------------------|--------------|
+| Ambrosio, Lorenzo Aivin F. | Client.py    |
+| Villamiel, Denis Leeroi J. | Server.py    |
